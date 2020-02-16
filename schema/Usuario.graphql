@@ -30,5 +30,6 @@ input PerfilInput {
 
 input PerfilFiltro {
     id: Int
-    nome: String
+    nome: String,
+    rotulo:String
 }
