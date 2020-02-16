@@ -9,14 +9,15 @@ module.exports = {
                      email,
                      senha
            }
+                
+             await db('usuarios')
+                        .where('email',email)
+                        .then((count) => {
+                            if (count != 0) {
+                                throw new Error('Este email já esta em nossa base de dados!');
+                            } 
+                        })
 
-           let verifyEmail = await db('usuarios')
-                             .where({email,})
-                             .count();
-
-            if(verifyEmail > 0){
-                   throw new Error('Este email já esta em nossa base de dados!');
-            }
 
             let nomePerfil = dados.perfis[0].nome;
             let rotulo = dados.perfis[0].rotulo;
@@ -50,7 +51,29 @@ module.exports = {
 
     },
     async excluirUsuario(_, { filtro }) {
-        // Implementar
+          const { id, email } = filtro;
+
+         await db('usuarios')
+                .where('id',id)
+                .then((count) => {
+                    if (count == 0) {
+                        throw new Error('Este usuario não existe');
+                    } 
+                })
+          // delete on cascate
+          try {
+            
+            let perfilId = await db('usuarios_perfis').where({usuario_id:id}).select('perfil_id').first();
+            await db('usuarios_perfis').where({usuario_id:id}).del();
+            await db('perfis').where('id',perfilId.perfil_id).del();
+            await db('usuarios').where({id:id}).del();
+
+            return 'Usuário excluido com sucesso!';
+
+          } catch (error) {
+              return error;
+          }
+          
     },
     async alterarUsuario(_, { filtro, dados }) {
         // Implementar
