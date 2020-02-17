@@ -66,7 +66,11 @@ module.exports = {
           try {
             
             let idsToDelete = await db('usuarios_perfis')
-                            .where({usuario_id:id})
+                            .innerJoin('usuarios','usuarios_perfis.usuario_id','=','usuarios.id')
+                            .where(function(){
+                                   this.where({usuario_id:id})
+                                       .orWhere({email:email})
+                            })
                             .select('usuario_id','perfil_id')
                             .first();
 
@@ -84,6 +88,46 @@ module.exports = {
           
     },
     async alterarUsuario(_, { filtro, dados }) {
-        // Implementar
+        
+         const { id } = filtro;
+         const { nome, email, senha } = dados;
+
+        const { rotulo } = dados.perfis[0];
+        const namePerfil = dados.perfis[0].nome;
+
+        
+         await db('usuarios_perfis')
+                    .innerJoin('usuarios','usuarios_perfis.usuario_id','=','usuarios.id').as('users')
+                    .innerJoin('perfis','usuarios_perfis.perfil_id','=','perfis.id')
+                    .where(function(){
+                            this.where('usuarios_perfis.usuario_id',id)
+                                .orWhere('usuarios.email',email)
+                    })
+                    .update({
+                              'usuarios.nome':nome,
+                              'usuarios.email':email,
+                              'usuarios.senha':senha,
+                              'perfis.nome':namePerfil,
+                              'perfis.rotulo':rotulo
+                            }
+                    )
+
+
+        return await db('usuarios_perfis')
+                    .innerJoin('usuarios','usuarios_perfis.usuario_id','=','usuarios.id')
+                    .innerJoin('perfis','usuarios_perfis.perfil_id','=','perfis.id')
+                    .where({usuario_id:id})
+                    .select('usuarios.id',
+                            'usuarios.nome',
+                            'usuarios.email',
+                            'perfis.id as perfil_id',
+                            'perfis.nome as perfil_nome',
+                            'perfis.rotulo as perfil_rotulo',
+                            'usuarios_perfis.perfil_id')
+                    .first();
+
+
+        
+        
     }
 }
