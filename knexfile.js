@@ -5,7 +5,7 @@ module.exports = {
   connection: {
     host : '127.0.0.1',
     user : 'root',
-    password : '@Dualcore1',
+    password : '12345',
     database: 'desafio-cap-04',
   
   },

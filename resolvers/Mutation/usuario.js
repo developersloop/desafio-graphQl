@@ -1,5 +1,7 @@
 const db = require('../../config/db')
 const _ = require('lodash');
+
+
 module.exports = {
     async novoUsuario(_, { dados }) {
            const { nome,email,senha } = dados;
@@ -63,12 +65,18 @@ module.exports = {
           // delete on cascate
           try {
             
-            let perfilId = await db('usuarios_perfis').where({usuario_id:id}).select('perfil_id').first();
+            let idsToDelete = await db('usuarios_perfis')
+                            .where({usuario_id:id})
+                            .select('usuario_id','perfil_id')
+                            .first();
+
+            const { usuario_id,perfil_id } = idsToDelete;
+            
             await db('usuarios_perfis').where({usuario_id:id}).del();
-            await db('perfis').where('id',perfilId.perfil_id).del();
+            await db('perfis').where('id',perfil_id).del();
             await db('usuarios').where({id:id}).del();
 
-            return 'Usuário excluido com sucesso!';
+            
 
           } catch (error) {
               return error;
