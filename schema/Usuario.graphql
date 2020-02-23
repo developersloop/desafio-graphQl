@@ -20,7 +20,8 @@ input UsuarioFiltro {
 type Perfil {
     id: Int
     nome: String!
-    rotulo: String!
+    rotulo: String!,
+    usuarios:[Usuario]
 }
 
 input PerfilInput {

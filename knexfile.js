@@ -4,8 +4,8 @@ module.exports = {
   client: 'mysql',
   connection: {
     host : '127.0.0.1',
-    user : 'root',
-    password : '12345',
+    user : 'develop',
+    password : '@Dualcore1',
     database: 'desafio-cap-04',
   
   },
